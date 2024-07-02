@@ -7,12 +7,19 @@
     <body>
         <section class="All-cities">
             <h2 class="All-cities__title">Communes de France</h2>
-            <ul class="List-cities" id="List-cities">
-
-            </ul>
-
+            <input type="text" name="Filter-List-cities" id="Filter-List-cities">
+            <ul class="List-cities" id="List-cities"></ul>
+            <gmp-map
+            center="37.4220656,-122.0840897"
+            zoom="10"
+            map-id="DEMO_MAP_ID"
+            style="height: 400px"
+            ></gmp-map>
         </section>
 
     </body>
-    <script src="./Index.js"></script>
+    <script 
+        src="./Index.js"
+        src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&loading=async&libraries=map,marker">
+    </script>
 </html>
