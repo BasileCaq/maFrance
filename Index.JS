@@ -1,20 +1,19 @@
-
 var cities
 
 //Initialization function
 document.addEventListener("DOMContentLoaded", function() {
     console.log("L'application est initialisée.");
-    loadFile()
-    filterButton()
+    //loadFile()
+    //filterButton()
 });
 
 const filterButton = () => {
    filterInput = document.getElementById("Filter-List-cities")
    filterInput.addEventListener('input',function(){
         const filterValue = filterInput.value.toLowerCase();
-        const filteredCities = cities.filter((city) => city["properties"]["libgeo"].toLowerCase().includes(filterValue));
+        //const filteredCities = cities.filter((city) => city["properties"]["libgeo"].toLowerCase().includes(filterValue));
         removeCities();
-        diplayCities(filteredCities);
+        //diplayCities(filteredCities);
    })
 }
 
@@ -35,7 +34,7 @@ const loadFile = () => {
         return response.json();
     })
     .then(data => {
-        cities = data["features"];
+        //cities = data["features"];
         diplayCities(cities)
     })
     .catch(error => {
