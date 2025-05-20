@@ -2,8 +2,8 @@ var cities
 
 //Initialization function
 document.addEventListener("DOMContentLoaded", function() {
-    console.log("L'application est initialisée.");
-    //loadFile()
+    //console.log("L'application est initialisée.");
+    //loadFile_SVG()
     //filterButton()
 });
 
@@ -18,14 +18,14 @@ const filterButton = () => {
 }
 
 const removeCities = () => {
-    var list = document.getElementById("List-cities")
+    var list = document.getElementById("citiesList")
     while(list.firstChild){
         list.removeChild(list.firstChild);
         }
 }
 
 
-const loadFile = () => {
+const loadFile_JSON= () => {
     fetch("Assets/Json/Geo.json")        
     .then(response => {
         if (!response.ok) {
@@ -35,7 +35,7 @@ const loadFile = () => {
     })
     .then(data => {
         //cities = data["features"];
-        diplayCities(cities)
+        //diplayCities(cities)
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
@@ -44,10 +44,55 @@ const loadFile = () => {
     
 }
 
+const loadFile_SVG=() => {
+    fetch("Assets/SVG/France_(Communes).svg")
+    .then(response => response.text())
+    .then(data => {
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(data, 'image/svg+xml');
+        const citiesList = document.getElementById('citiesList');
+        const citiesMap = document.getElementById('citiesMap')
+
+        // Fonction récursive pour extraire les <path>
+        function extractPaths(element) {
+            const paths = element.querySelectorAll('path');
+            paths.forEach(path => {
+                const d = path.getAttribute('id');
+
+                const li = document.createElement('li');
+                li.textContent = ` ${d}`;
+                li.id = d
+                citiesList.appendChild(li);
+
+                const link = document.createElement('a');
+                path.addEventListener('mouseenter', function(e){
+                    console.log('salut')
+                })
+                link.appendChild(path)
+                citiesMap.append(path)
+                
+
+            });
+            
+            // Rechercher les enfants <g> récursivement
+            const groups = element.querySelectorAll('g');
+            groups.forEach(group => {
+                extractPaths(group);
+            });
+        }
+
+        // Commencer l'extraction à partir du document SVG
+        extractPaths(svgDoc.documentElement);
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });
+}
+
+
 const diplayCities = (jsonData) => {
     for (var i = 1; i < jsonData.length; i++){
         var city = document.createElement("ul")
         city.textContent = jsonData[i]["properties"]["libgeo"]
-        document.getElementById("List-cities").appendChild(city)
-    }
-}
+        document.getElementById("citiesList").appendChild(city)
+   

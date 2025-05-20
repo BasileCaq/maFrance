@@ -1,0 +1,12 @@
+.map__image{
+    float: left;
+}
+
+.map__image path{
+    fill: #a4ced2;
+    transition: fill 0,3s;
+}
+
+.map__image path:hover{
+    fill: #e03336;
+}
