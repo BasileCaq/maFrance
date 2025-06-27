@@ -1,98 +1,60 @@
-var cities
+let allCommunes = []; // toutes les communes
+const communeList = document.getElementById('commune-list');
+const searchInput = document.getElementById('commune-search');
 
-//Initialization function
-document.addEventListener("DOMContentLoaded", function() {
-    //console.log("L'application est initialisée.");
-    //loadFile_SVG()
-    //filterButton()
-});
-
-const filterButton = () => {
-   filterInput = document.getElementById("Filter-List-cities")
-   filterInput.addEventListener('input',function(){
-        const filterValue = filterInput.value.toLowerCase();
-        //const filteredCities = cities.filter((city) => city["properties"]["libgeo"].toLowerCase().includes(filterValue));
-        removeCities();
-        //diplayCities(filteredCities);
-   })
-}
-
-const removeCities = () => {
-    var list = document.getElementById("citiesList")
-    while(list.firstChild){
-        list.removeChild(list.firstChild);
-        }
-}
+// Initialisation de la carte
+const map = L.map('map').setView([46.5, 2.5], 6);
 
 
-const loadFile_JSON= () => {
-    fetch("Assets/Json/Geo.json")        
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok' + response.statusText);
-        }
-        return response.json();
-    })
-    .then(data => {
-        //cities = data["features"];
-        //diplayCities(cities)
-    })
-    .catch(error => {
-        console.error('There was a problem with the fetch operation:', error);
-    });
+// Fond de carte léger (CartoDB)
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; Carto',
+  subdomains: 'abcd',
+  maxZoom: 19
+}).addTo(map);
 
-    
-}
-
-const loadFile_SVG=() => {
-    fetch("Assets/SVG/France_(Communes).svg")
-    .then(response => response.text())
-    .then(data => {
-        const parser = new DOMParser();
-        const svgDoc = parser.parseFromString(data, 'image/svg+xml');
-        const citiesList = document.getElementById('citiesList');
-        const citiesMap = document.getElementById('citiesMap')
-
-        // Fonction récursive pour extraire les <path>
-        function extractPaths(element) {
-            const paths = element.querySelectorAll('path');
-            paths.forEach(path => {
-                const d = path.getAttribute('id');
-
-                const li = document.createElement('li');
-                li.textContent = ` ${d}`;
-                li.id = d
-                citiesList.appendChild(li);
-
-                const link = document.createElement('a');
-                path.addEventListener('mouseenter', function(e){
-                    console.log('salut')
-                })
-                link.appendChild(path)
-                citiesMap.append(path)
-                
-
-            });
-            
-            // Rechercher les enfants <g> récursivement
-            const groups = element.querySelectorAll('g');
-            groups.forEach(group => {
-                extractPaths(group);
-            });
-        }
-
-        // Commencer l'extraction à partir du document SVG
-        extractPaths(svgDoc.documentElement);
-    })
-    .catch(error => {
-        console.error('There was a problem with the fetch operation:', error);
+//Afficher les communes filtrés
+function afficherCommunes(filtrés) {
+    communeList.innerHTML = '';
+    filtrés.forEach(({nom,layer}) => {
+        const item = document.createElement('div');
+        item.textContent = nom;
+        item.classList.add('commune-item');
+        item.onclick = () => {
+            map.fitBounds(layer.getBounds());
+            layer.setStyle({ fillColor: 'red' });
+        };
+        communeList.appendChild(item);
     });
 }
 
+// Chargement du fichier GeoJSON
+fetch('Assets/GeoJson/communes.geojson')
+  .then(response => response.json())
+  .then(data => {
+    const communeList = document.getElementById('commune-list');
 
-const diplayCities = (jsonData) => {
-    for (var i = 1; i < jsonData.length; i++){
-        var city = document.createElement("ul")
-        city.textContent = jsonData[i]["properties"]["libgeo"]
-        document.getElementById("citiesList").appendChild(city)
-   
+    L.geoJSON(data, {
+      style: feature => ({
+        color: '#333',
+        fillColor: '#ccc',
+        fillOpacity: 0.7,
+        weight: 0.5
+      }),
+      onEachFeature: (feature, layer) => {
+        const nom = feature.properties.nom || feature.properties.name || 'Commune inconnue';
+
+        allCommunes.push({nom,layer})
+      }
+    }).addTo(map);
+
+    // Affiche tout au début
+    afficherCommunes(allCommunes);
+  });
+
+// Filtrage en live quand l'utilisateur tape
+searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase();
+    const filtrées = allCommunes.filter(c => c.nom.toLowerCase().includes(q));
+    afficherCommunes(filtrées);
+  });
