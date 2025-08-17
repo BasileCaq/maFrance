@@ -1,4 +1,4 @@
-import { supabase, signInWithEmail, signUp } from './Auth.js'
+import { supabase, signInWithEmail, signUp } from './auth.js'
 
 let communeMap = new Map();
 let currentUser = null;
