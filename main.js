@@ -192,13 +192,6 @@ function afficherListeCommunes(communes) {
   });
 }
 
-function newListDepartement(nom, numéro, nb_commune){
-      const item_dep = document.createElement('div');
-      item_dep.textContent = nom;
-      communeList.appendChild(item_dep);
-      return  item_dep;
-}
-
 
 async function chercherVisitesParNom(nomRecherche) {
 const { data, error } = await supabase
