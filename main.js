@@ -45,7 +45,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
 }).addTo(map);
 
 // Chargement du fichier GeoJSON
-fetch('Assets/GeoJson/communes.geojson')
+fetch('./Assets/GeoJson/communes.geojson')
   .then(response => response.json())
   .then(data => {
 
@@ -65,7 +65,7 @@ fetch('Assets/GeoJson/communes.geojson')
     }).addTo(map);
   });
 
-fetch('Assets/GeoJson/departements.geojson')
+fetch('./Assets/GeoJson/departements.geojson')
   .then(response => response.json())
   .then(data => {
 
