@@ -12,7 +12,6 @@ export async function signInAnonymously() {
   return data.user
   }
 
-  
 //Créer un compte
 export async function signUp(email, password) {
   const { data, error } = await supabase.auth.signUp({ email, password});
