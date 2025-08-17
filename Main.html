@@ -7,12 +7,52 @@
   <link rel="stylesheet" href="Styles/Style.css" />
 </head>
 <body>
-  <div id="map"></div>
-  <div id="commune-panel">
-    <input type="text" id="commune-search" placeholder="Rechercher une commune..." />
-    <div id="commune-list"></div>
-  </div>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="index.js"></script> <!-- Ton fichier JS externe -->
+  <header>
+    <img id="app-logo" src="Assets/Image/France_Logo.png"></img> 
+    <label id="app-title"> MaFrance </label>
+    <div id="connexion">
+      <button id="btn-connect">Connexion</button>
+      <div id="resultat"></div>
+    </div>
+  </header>
+
+  <main>
+    <div id="map-panel">
+      <div id="map"></div>
+      <div id="info-commune" class="visible">
+        <div id="info-commune_header">
+          <label id="info-nom"></label>
+          <label id="info-code-postale"></label>
+          <input type="checkbox" id="info-commune_visited" />
+          <button id="info-commune_close">X</button>
+        </div>
+        <label id="info-commune_detaillé">
+          <label id="info-commune-catégorie">
+            Catégorie :
+            <select id="visit-status">
+              <option value="Non visité">Non visité</option>
+              <option value="visité">Visité</option>
+              <option value="passé">Passé par</option>
+             <option value="habité">Habitait dans</option>
+            </select>
+          </label>
+          <label id="info-commune-date-visite"> 
+            Date : 
+             <input type="date" id="input-date" style="display: block;" />
+          </label>
+          <label>Mode de Transport : <span id="info-transport">Non défini</span></label>
+        </label>
+      </div>
+    </div>
+
+    <div id="commune-list-panel">
+      <input type="text" id="commune-search" placeholder="Rechercher une commune..." />
+      <div id="commune-list"></div>
+    </div>
+
+  </main>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>     <!-- Bibliothèque Leaflet -->  
+  <script type="module" src="main.js"></script>      <!-- Fichier JS principal -->
 </body>
 </html>

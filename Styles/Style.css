@@ -1,14 +1,115 @@
-body {
-    display: flex;
-  }
+:root{
+  --visité-color: green;
+  --habitait-dans-color: rgb(0, 123, 255); 
+}
+
+html, body {
+  width:100%;
+  margin: 0;
+}
+
+header {
+  position:fixed;
+  display: flex;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width:100%;
+  height:60px;
+  background: green;
+  color: #fff;
+}
+
+#app-logo{
+  width: 50px;
+
+}
+
+#app-title{
+  font-size: 30pt;
+  color: #fff;
+}
+
+#connexion{
+  margin-left:auto;
+}
+
+main {
+  display: flex;
+  height: calc(100vh - 60px);
+  margin-top: 60px; /* hauteur du header */
+  overflow: hidden;
+}
+
+#map-panel {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
 #map {
-    height: 100vh;
-    width: 75%;
-  }
+  flex: 1;
+}
 
+
+#info-commune {
+  position: absolute;
+  align-self: center;
+  width: 700px;
+  display:fixed;
+  justify-content: space-between;
+  bottom: -100%;
+  margin: auto;
+  background: white;
+  border-top: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 15px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+#info-commune.visible {
+  bottom:0
+}
+
+
+#info-commune_header{
+  font-size: 30px;
+  padding: 10px;
+  display: flex;
+}
+
+#info-commune_visited{
+  border-radius: 50%;
+  accent-color: var(--visité-color);
+}
+
+
+#info-commune_close {
+  border-radius: 50%;
+  margin-left: auto;
+  background-color: #fff;
+}
+
+#info-commune_detaillé {
+  display: flex;
+  flex-direction: column;
+}
+
+
+#commune-list-panel {
+  width: 300px;
+  border-left: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
 #commune-list {
-    height: 100vh;
+    height: 80vh;
     overflow-y: scroll;
     padding: 1rem;
     font-family: sans-serif;
@@ -23,3 +124,4 @@ body {
     font-size: 1rem;
     margin-bottom: 0.5rem;
 }
+
