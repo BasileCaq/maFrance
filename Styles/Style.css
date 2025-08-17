@@ -1,8 +1,3 @@
-:root{
-  --visité-color: green;
-  --habitait-dans-color: rgb(0, 123, 255); 
-}
-
 html, body {
   width:100%;
   margin: 0;
@@ -59,7 +54,7 @@ main {
   width: 700px;
   display:fixed;
   justify-content: space-between;
-  bottom: -100%;
+  bottom: -700px;
   margin: auto;
   background: white;
   border-top: 1px solid #ccc;
@@ -83,7 +78,7 @@ main {
 
 #info-commune_visited{
   border-radius: 50%;
-  accent-color: var(--visité-color);
+    accent-color: var(--color-visited);
 }
 
 
@@ -99,29 +94,67 @@ main {
 }
 
 
-#commune-list-panel {
+#mycommune-list-panel {
   width: 300px;
   border-left: 1px solid #ccc;
   display: flex;
   flex-direction: column;
-  padding: 10px;
   box-sizing: border-box;
   overflow-y: auto;
 }
-#commune-list {
-    height: 80vh;
+#mycommune-list {
     overflow-y: scroll;
-    padding: 1rem;
     font-family: sans-serif;
-
-  }
-.commune-item:hover {
-    background-color: #eee;
   }
 
-#commune-search {
+#mycommune-search {
     padding: 0.5rem;
     font-size: 1rem;
     margin-bottom: 0.5rem;
 }
 
+#allcommune-list-panel{
+  position: fixed;
+  height: 100%;
+  width: 300px;
+  right: -300px;
+  transition: right 0.3s ease;
+  background-color: #fff;
+  z-index: 1100;
+}
+
+#allcommune-list-panel.open{
+  right: 0;
+}
+
+#allcommune-list {
+    overflow-y: scroll;
+    font-family: sans-serif;
+  }
+
+.departement-header {
+  background-color: #eee;
+  padding: 6px;
+}
+
+.departement-stats{
+  border:solid 1px;
+  padding:2px 4px;
+  border-color: grey;
+  border-radius: 5%;
+  font-size: small;
+
+}
+
+.toggle-btn {
+  margin-left: auto;
+  background-color: transparent;
+  border: 0;
+}
+
+.commune-item {	
+  list-style-type: none;
+}
+.commune-item:hover {
+  background-color: #eee;
+}

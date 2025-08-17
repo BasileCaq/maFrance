@@ -4,7 +4,8 @@
   <meta charset="utf-8" />
   <title>Carte des communes</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="Styles/Style.css" />
+  <link rel="stylesheet" href="Styles/style.css" />
+  <link rel="stylesheet" href="Styles/colors.css" />
 </head>
 <body>
   <header>
@@ -31,23 +32,34 @@
             Catégorie :
             <select id="visit-status">
               <option value="Non visité">Non visité</option>
-              <option value="visité">Visité</option>
-              <option value="passé">Passé par</option>
-             <option value="habité">Habitait dans</option>
+              <option value="Visité">Visité</option>
+              <option value="Passé">Passé par</option>
+             <option value="Habité">Habitait dans</option>
             </select>
           </label>
           <label id="info-commune-date-visite"> 
             Date : 
-             <input type="date" id="input-date" style="display: block;" />
+             <input type="date" id="input-date" style="display: inline;" />
           </label>
           <label>Mode de Transport : <span id="info-transport">Non défini</span></label>
         </label>
       </div>
     </div>
 
-    <div id="commune-list-panel">
-      <input type="text" id="commune-search" placeholder="Rechercher une commune..." />
-      <div id="commune-list"></div>
+    <div id="mycommune-list-panel">
+      <div id=" mycommune-list-panel__header">
+        <input type="text" id="mycommune-search" placeholder="Mes communes" />
+        <button id="new-commune-research-button">+</button>
+      </div>
+      <div id="mycommune-list"></div>
+    </div>
+
+    <div id="allcommune-list-panel">
+      <button id="all-commune-close-button">X</button>
+      <div id=" allcommune-list-panel__header">
+        <input type="text" id="allcommune-search" placeholder="Rechercher une commune..." />
+      </div>
+      <div id="allcommune-list"></div>
     </div>
 
   </main>

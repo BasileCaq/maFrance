@@ -24,3 +24,5 @@ export async function signInWithEmail(email, password){
   if (error) throw error;
   return data.user;
 }
+
+
