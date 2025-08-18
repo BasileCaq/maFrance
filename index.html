@@ -11,9 +11,25 @@
   <header>
     <img id="app-logo" src="Assets/Image/France_Logo.png"></img> 
     <label id="app-title"> MaFrance </label>
-    <div id="connexion">
-      <button id="btn-connect">Connexion</button>
-      <div id="resultat"></div>
+    <div id="profile-container">
+      <button id="profile-btn">
+        <img src="Assets/Image/profile_icon.svg" alt="Profil" style="width:32px;height:32px;border-radius:50%;" />
+      </button>
+      <div id="profile-menu">
+        <div id="profile-not-connected">
+         <input type="email" id="profile-email-input" placeholder="Entrez votre email" />
+         <input type="password" id="profile-password-input" placeholder="Entrez votre mot de passe" />
+          <button id="profile-login">Connexion</button>
+         <button id="profile-register">Inscription</button>
+       </div>
+       <div id="profile-connected" style="display:none;">
+          <span id="profile-email"></span>
+          <button id="profile-logout">Déconnexion</button>
+          <hr>
+          <a href="#" id="profile-stats">Stats</a><br>
+          <a href="#" id="profile-settings">Paramètres</a>
+        </div>
+      </div>
     </div>
   </header>
 

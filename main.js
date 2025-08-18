@@ -8,16 +8,41 @@ const allcommuneSearch = document.getElementById('allcommune-search');
 
 const map = L.map('map', { preferCanvas: true }).setView([46.5, 2.5], 6);   // Initialisation de la carte
 
-document.getElementById('btn-connect').addEventListener('click', async () => {
+// Gestion du bouton profil
+const profileBtn = document.getElementById('profile-btn');
+const profileMenu = document.getElementById('profile-menu');
+let isConnected = false; // À remplacer par ta logique utilisateur
+
+profileBtn.addEventListener('click', () => {
+  profileMenu.style.display = profileMenu.style.display === 'none' ? 'block' : 'none';
+});
+
+document.getElementById('profile-login').addEventListener('click', async () => {
   try {
     //const user = await signUp('basilecaquot@hotmail.fr','maFrance')
-    currentUser = await signInWithEmail('basilecaquot@hotmail.fr','maFrance')
-    document.getElementById('resultat').textContent = "Connecté avec : " + currentUser.email
+    const email = document.getElementById('profile-email-input').value;
+    const password = document.getElementById('profile-password-input').value;
+    if (!email || !password) {
+      alert("Veuillez entrer un email et un mot de passe.");
+      return;
+    }
+    currentUser = await signInWithEmail(email, password);
+    //document.getElementById('resultat').textContent = "Connecté avec : " + currentUser.email
     await chargerCommunesVisitees()
   } catch (err) {
     console.error("Erreur :", err.message)
   }
 })
+
+// Exemple de logique pour afficher les bonnes options
+function updateProfileMenu(user) {
+  isConnected = !!user;
+  document.getElementById('profile-not-connected').style.display = isConnected ? 'none' : 'block';
+  document.getElementById('profile-connected').style.display = isConnected ? 'block' : 'none';
+  if (isConnected) {
+    document.getElementById('profile-email').textContent = user.email;
+  }
+}
 
 document.getElementById('new-commune-research-button').addEventListener('click', async () => {
   document.getElementById('allcommune-list-panel').classList.add('open');
