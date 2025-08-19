@@ -2,15 +2,17 @@ import { supabase, signInWithEmail, signUp } from './auth.js'
 
 let communeMap = new Map();
 let currentUser = null;
-const communeList = document.getElementById('mycommune-list');
+let allCommunes = [];
 const mycommuneSearch = document.getElementById('mycommune-search');
 const allcommuneSearch = document.getElementById('allcommune-search');
-
 const map = L.map('map', { preferCanvas: true }).setView([46.5, 2.5], 6);   // Initialisation de la carte
-
-// Gestion du bouton profil
 const profileBtn = document.getElementById('profile-btn');
 const profileMenu = document.getElementById('profile-menu');
+
+chargerFondDeCarte();
+chargerToutesLesCommunes();
+chargerCommunesGeoJSON();
+chargerDepartementsGeoJSON();
 
 profileBtn.addEventListener('click', () => {
   profileMenu.style.display = profileMenu.style.display === 'none' ? 'block' : 'none';
@@ -68,52 +70,67 @@ mycommuneSearch.addEventListener('input', async () => {
 });
 
 allcommuneSearch.addEventListener('input', async () => {
-  const resultats = await chercherCommunesParNom(allcommuneSearch.value.trim());
+  const recherche = allcommuneSearch.value.trim().toLowerCase();
+  const resultats = allCommunes.filter(c =>
+    c.nom.toLowerCase().includes(recherche)
+  );
   afficherListeCommunes(resultats);
 });
 
+
 // Fond de carte léger (CartoDB)
+async function chargerFondDeCarte() {
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; Carto',
   subdomains: 'abcd',
   maxZoom: 19
 }).addTo(map);
+}
 
-// Chargement du fichier GeoJSON
+
+async function chargerCommunesGeoJSON(){
 fetch('./Assets/GeoJson/communes.geojson')
   .then(response => response.json())
   .then(data => {
-
     L.geoJSON(data, {
       style: feature => ({color: '#333', fillColor: '#ccc', fillOpacity: 0.7, weight: 0.5}),
       onEachFeature: (feature, layer) => {
         const codeInsee = feature.properties.code;
         communeMap.set(codeInsee, layer);
-
         layer.on('click', () => {
-
           map.fitBounds(layer.getBounds(),{padding: [70,70]});
           afficherInfoCommune(codeInsee);
         });
-
       }
     }).addTo(map);
   });
+}
 
+async function chargerDepartementsGeoJSON(){
 fetch('./Assets/GeoJson/departements.geojson')
   .then(response => response.json())
   .then(data => {
-
     L.geoJSON(data, {
       style: feature => ({color: '#000', fillColor: '#fff', Opacity: 1, weight: 2})
     }).addTo(map);
   });
+}
 
-
-
+async function chargerToutesLesCommunes() {
+  const { data, error } = await supabase
+    .from('commune')
+    .select('nom,code_insee,departement(code,nom)');
+  if (error) {
+    console.error("Erreur lors du chargement des communes :", error.message);
+    return;
+  }
+  allCommunes = data;
+  console.log("Chargement des communes terminé :", allCommunes.length);
+  afficherListeCommunes(allCommunes); // Affiche tout au départ
+}
+  
 async function chargerCommunesVisitees(){
   const departementMap = new Map();
-
   const resultats = await chercherVisitesParNom(mycommuneSearch.value.trim());
   afficherListeVisites(resultats);
   colorerCarte(resultats);
@@ -225,13 +242,6 @@ function afficherListeCommunes(communes) {
 
     container.appendChild(item);
   });
-}
-
-function newListDepartement(nom, numéro, nb_commune){
-      const item_dep = document.createElement('div');
-      item_dep.textContent = nom;
-      communeList.appendChild(item_dep);
-      return  item_dep;
 }
 
 
