@@ -11,7 +11,6 @@ const map = L.map('map', { preferCanvas: true }).setView([46.5, 2.5], 6);   // I
 // Gestion du bouton profil
 const profileBtn = document.getElementById('profile-btn');
 const profileMenu = document.getElementById('profile-menu');
-let isConnected = false; // À remplacer par ta logique utilisateur
 
 profileBtn.addEventListener('click', () => {
   profileMenu.style.display = profileMenu.style.display === 'none' ? 'block' : 'none';
@@ -19,7 +18,6 @@ profileBtn.addEventListener('click', () => {
 
 document.getElementById('profile-login').addEventListener('click', async () => {
   try {
-    //const user = await signUp('basilecaquot@hotmail.fr','maFrance')
     const email = document.getElementById('profile-email-input').value;
     const password = document.getElementById('profile-password-input').value;
     if (!email || !password) {
@@ -27,20 +25,32 @@ document.getElementById('profile-login').addEventListener('click', async () => {
       return;
     }
     currentUser = await signInWithEmail(email, password);
-    //document.getElementById('resultat').textContent = "Connecté avec : " + currentUser.email
+    updateProfileMenu()
     await chargerCommunesVisitees()
   } catch (err) {
     console.error("Erreur :", err.message)
   }
 })
 
+document.getElementById('profile-logout').addEventListener('click', async () => {
+  try {
+    await supabase.auth.signOut();
+    currentUser = null;
+    updateProfileMenu();
+    document.getElementById('mycommune-list').innerHTML = '';
+    document.getElementById('info-commune').classList.remove('visible');
+  } catch (err) {
+    console.error("Erreur lors de la déconnexion :", err.message);
+  }
+});
+
 // Exemple de logique pour afficher les bonnes options
-function updateProfileMenu(user) {
-  isConnected = !!user;
-  document.getElementById('profile-not-connected').style.display = isConnected ? 'none' : 'block';
-  document.getElementById('profile-connected').style.display = isConnected ? 'block' : 'none';
+function updateProfileMenu() {
+  const isConnected = !!currentUser;
+  document.getElementById('profile-not-connected').style.display = isConnected ? 'none' : 'flex';
+  document.getElementById('profile-connected').style.display = isConnected ? 'flex' : 'none';
   if (isConnected) {
-    document.getElementById('profile-email').textContent = user.email;
+    document.getElementById('profile-email').textContent = currentUser.email;
   }
 }
 
