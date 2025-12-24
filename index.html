@@ -2,40 +2,24 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Carte des communes</title>
+  <title>Mon Petit Pays</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="Styles/style.css" />
   <link rel="stylesheet" href="Styles/colors.css" />
 </head>
 <body>
-  <header>
-    <img id="app-logo" src="Assets/Image/France_Logo.png"></img> 
-    <label id="app-title"> MaFrance </label>
-    <div id="profile-container">
-      <button id="profile-btn">
-        <img src="Assets/Image/profile_icon.png" alt="Profil" style="width:32px;height:32px"/>
-      </button>
-      <div id="profile-menu">
-        <div id="profile-not-connected">
-         <input type="email" id="profile-email-input" placeholder="Entrez votre email" />
-         <input type="password" id="profile-password-input" placeholder="Entrez votre mot de passe" />
-          <button id="profile-login">Connexion</button>
-         <button id="profile-register">Inscription</button>
-       </div>
-       <div id="profile-connected">
-          <span id="profile-email"></span>
-          <button href="#" id="profile-stats">Stats</button>
-          <button href="#" id="profile-settings">Paramètres</button>
-          <button id="profile-logout">Déconnexion</button>
-        </div>
-      </div>
-    </div>
-  </header>
-
+<div id="header-placeholder"></div>
+<script>
+  fetch('header.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('header-placeholder').innerHTML = html;
+    });
+</script>
   <main>
     <div id="map-panel">
       <div id="map"></div>
-      <div id="info-commune" class="visible">
+      <div id="info-commune">
         <div id="info-commune_header">
           <label id="info-nom"></label>
           <label id="info-code-postale"></label>
@@ -76,10 +60,10 @@
       </div>
       <div id="allcommune-list"></div>
     </div>
-
   </main>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>     <!-- Bibliothèque Leaflet -->  
   <script type="module" src="main.js"></script>      <!-- Fichier JS principal -->
+  <script type="module" src="header.js"></script>       <!-- Gestion de l'en-tête -->
 </body>
 </html>

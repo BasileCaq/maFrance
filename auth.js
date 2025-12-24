@@ -1,4 +1,21 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.34.0/+esm';
+
+export let currentUser = null;
+
+export function reloadCurrentUser() {
+  return supabase.auth.getUser().then(({ data }) => {
+    if (data?.user) {
+      setCurrentUser(data.user);
+      return data.user;
+    }
+    setCurrentUser(null);
+    return null;
+  });
+}
+
+export function setCurrentUser(user) {
+  currentUser = user;
+}
 
 export const supabase = createClient(
     'https://joqxqsutiiosetxphxmn.supabase.co',      // URL Supabase
@@ -15,6 +32,8 @@ export async function signInAnonymously() {
 //Créer un compte
 export async function signUp(email, password) {
   const { data, error } = await supabase.auth.signUp({ email, password});
+  if (error) throw error;
+  return data.user;
 }
 
 //Se connecter avec ses identifiants

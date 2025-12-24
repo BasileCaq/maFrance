@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Inscription - Mon Petit Pays</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="Styles/style.css" />
+  <link rel="stylesheet" href="Styles/colors.css" />
+</head>
+<body>
+<div id="header-placeholder"></div>
+<script>
+  fetch('header.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('header-placeholder').innerHTML = html;
+    });
+</script>
+  <main>
+    <h2>Statistiques</h2>
+    <div id="stats-container">
+      <p>Nombre de communes visitées : <span id="communes-visitees-count">0</span></p>
+      <p>Nombre de départements visités : <span id="departements-visites-count">0</span></p>
+    </div>
+  </main>
+  <script type="module" src="stats.js"></script>
+  <script type="module" src="header.js"></script>       <!-- Gestion de l'en-tête -->
+</body>
+</html>

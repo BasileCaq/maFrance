@@ -1,0 +1,27 @@
+  <header>
+    <img id="app-logo" src="Assets/Image/France_Logo.png"></img> 
+    <label id="app-title"> Mon Petit Pays </label>
+    <div id="profile-container">
+      <button id="profile-btn">
+        <img src="Assets/Image/profile_icon.png" alt="Profil" style="width:32px;height:32px"/>
+      </button>
+      <div id="profile-menu">
+        <div id="profile-not-connected">
+          <input type="email" id="profile-email-input" placeholder="Entrez votre email" />
+          <input type="password" id="profile-password-input" placeholder="Entrez votre mot de passe" />
+          <button id="profile-login">Connexion</button>
+          <div class="signup-link"> Pas encore de compte ? <a href="signup.html">Cliquez-ici</a></div>
+       </div>
+       <div id="profile-connected">
+          <nav id="profile-nav">
+            <a href="index.html" id="profile-home">Accueil</a>
+            <a href="stats.html" id="profile-stats">Stats</a>
+            <a href="#" id="profile-success">Badges</a>
+            <a href="#" id="profile-settings">Paramètres</a>
+          </nav>
+          <span id="profile-email"></span>
+          <button id="profile-logout">Déconnexion</button>
+        </div>
+      </div>
+    </div>
+  </header>

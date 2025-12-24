@@ -1,60 +1,22 @@
-import { supabase, signInWithEmail, signUp } from './auth.js'
+import { supabase, currentUser, reloadCurrentUser} from './auth.js'
 
 let communeMap = new Map();
-let currentUser = null;
+let visiteMap = new Map();
 let allCommunes = [];
 const mycommuneSearch = document.getElementById('mycommune-search');
 const allcommuneSearch = document.getElementById('allcommune-search');
 const map = L.map('map', { preferCanvas: true }).setView([46.5, 2.5], 6);   // Initialisation de la carte
-const profileBtn = document.getElementById('profile-btn');
-const profileMenu = document.getElementById('profile-menu');
 
 chargerFondDeCarte();
 chargerToutesLesCommunes();
 chargerCommunesGeoJSON();
 chargerDepartementsGeoJSON();
 
-profileBtn.addEventListener('click', () => {
-  profileMenu.style.display = profileMenu.style.display === 'none' ? 'block' : 'none';
-});
-
-document.getElementById('profile-login').addEventListener('click', async () => {
-  try {
-    const email = document.getElementById('profile-email-input').value;
-    const password = document.getElementById('profile-password-input').value;
-    if (!email || !password) {
-      alert("Veuillez entrer un email et un mot de passe.");
-      return;
-    }
-    currentUser = await signInWithEmail(email, password);
-    updateProfileMenu()
-    await chargerCommunesVisitees()
-  } catch (err) {
-    console.error("Erreur :", err.message)
-  }
-})
-
-document.getElementById('profile-logout').addEventListener('click', async () => {
-  try {
-    await supabase.auth.signOut();
-    currentUser = null;
-    updateProfileMenu();
-    document.getElementById('mycommune-list').innerHTML = '';
-    document.getElementById('info-commune').classList.remove('visible');
-  } catch (err) {
-    console.error("Erreur lors de la déconnexion :", err.message);
+reloadCurrentUser().then(user => {
+  if (user) {
+    chargerCommunesVisitees();
   }
 });
-
-// Exemple de logique pour afficher les bonnes options
-function updateProfileMenu() {
-  const isConnected = !!currentUser;
-  document.getElementById('profile-not-connected').style.display = isConnected ? 'none' : 'flex';
-  document.getElementById('profile-connected').style.display = isConnected ? 'flex' : 'none';
-  if (isConnected) {
-    document.getElementById('profile-email').textContent = currentUser.email;
-  }
-}
 
 document.getElementById('new-commune-research-button').addEventListener('click', async () => {
   document.getElementById('allcommune-list-panel').classList.add('open');
@@ -64,8 +26,12 @@ document.getElementById('all-commune-close-button').addEventListener('click', as
   document.getElementById('allcommune-list-panel').classList.remove('open');
 })
 
+
 mycommuneSearch.addEventListener('input', async () => {
-  const resultats = await chercherVisitesParNom(mycommuneSearch.value.trim());
+  const recherche = mycommuneSearch.value.trim().toLowerCase();
+  const resultats = visiteMap.filter(c =>
+    c.commune_nom.toLowerCase().includes(recherche)
+  );
   afficherListeVisites(resultats);
 });
 
@@ -129,23 +95,21 @@ async function chargerToutesLesCommunes() {
   afficherListeCommunes(allCommunes); // Affiche tout au départ
 }
   
-async function chargerCommunesVisitees(){
-  const departementMap = new Map();
+export async function chargerCommunesVisitees(){
   const resultats = await chercherVisitesParNom(mycommuneSearch.value.trim());
+  resultats.forEach(resultat => {
+    visiteMap.set(resultat.commune_codeinsee, resultat);
+    colorierCommune(resultat.commune_codeinsee, resultat.etat_visite);
+  });
   afficherListeVisites(resultats);
-  colorerCarte(resultats);
 }
 
 
-function colorerCarte(communes){
-  // Iteration de toute les communes visitées
-  communes.forEach((commune) => {
-    console.log(commune.commune_codeinsee);
-    const Layer = communeMap.get(commune.commune_codeinsee);    
+function colorierCommune(commune, etat) {
+    const Layer = communeMap.get(commune);    
     if (Layer) {
-      Layer.setStyle({ fillColor: 'green' });             //changement de la couleur sur la map
+      Layer.setStyle({ fillColor: etat === 'Visité' ? 'green' : '#ccc' });             //changement de la couleur sur la map
     }
-  });
 }
 
 function afficherListeVisites(visites) {
@@ -159,7 +123,7 @@ function afficherListeVisites(visites) {
     const depNom = commune.departement_nom;
     const depNumero = commune.departement_numero;
     const key = `${depNumero} - ${depNom}`;
-
+  
     if (!groupes.has(key)) {
       groupes.set(key, []);
     }
@@ -200,10 +164,10 @@ function afficherListeCommunes(communes) {
   const container = document.getElementById('allcommune-list');
   container.innerHTML = '';
 
-  // Grouper les visites par département
+  // Grouper les communes par département
   const groupes = new Map();
 
-  communes.forEach(( commune ) => {
+  communes.forEach((commune) => {
     const depNom = commune.departement.nom;
     const depNumero = commune.departement.code;
     const key = `${depNumero} - ${depNom}`;
@@ -221,29 +185,119 @@ function afficherListeCommunes(communes) {
     const item = document.createElement('div');
     item.className = 'departement-item';
 
+    // Création de la liste des communes
+    const communeList = document.createElement('ul');
+    communeList.className = 'allcommune-list';
+
+    communes.forEach((c) => {
+      const li = document.createElement('li');
+      li.className = 'commune-item';
+
+      // Création de la case à cocher
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'commune-visited-checkbox';
+      checkbox.checked = visiteMap.has(c.code_insee);
+      checkbox.id = `checkbox-${c.code_insee}`;
+
+      // Gestion du clic sur la case à cocher
+      checkbox.addEventListener('change', async (e) => {
+        if (!currentUser) {
+          alert("Connectez-vous pour marquer une commune comme visitée.");
+          checkbox.checked = !checkbox.checked;
+          return;
+        }
+        if (checkbox.checked) {
+          newvisite(c.code_insee, 'Visité', null);
+          colorierCommune(c.code_insee, 'Visité');
+          chargerCommunesVisitees();
+        } else {
+          deletevisite(c.code_insee);
+          colorierCommune(c.code_insee, 'non_visitee');
+          chargerCommunesVisitees();
+        }
+      });
+      // Gestion du clic sur le nom de la commune
+      const span = document.createElement('span');
+      span.textContent = c.nom;
+      if (visiteMap.has(c.code_insee)) {
+        li.classList.add('visited');
+      } else {
+        li.classList.add('not-visited');
+      }
+      span.style.cursor = 'pointer';
+      span.addEventListener('click', () => {
+        afficherInfoCommune(c.code_insee);
+        const layer = communeMap.get(c.code_insee);
+        if (layer) {
+          map.fitBounds(layer.getBounds(), { padding: [70, 70] });
+        }
+      });
+
+      li.appendChild(span);
+      //li.appendChild(checkbox);           <---- A remettre pour puce à cocher
+
+      communeList.appendChild(li);
+    });
+
     item.innerHTML = `
       <div class="departement-header">
         <span class="departement-nom">${depNom} (${depNumero})</span>
         <span class="departement-stats">${communes.length} / ${totalCommunes}</span>
         <button class="toggle-btn">▼</button>
       </div>
-      <ul class="allcommune-list">
-        ${communes.map(c => `<li class="commune-item">${c.nom}</li>`).join('')}
-      </ul>
     `;
+    item.appendChild(communeList);
 
     // Ajouter toggle pour afficher/masquer la liste
     const toggleBtn = item.querySelector('.toggle-btn');
-    const list = item.querySelector('.allcommune-list');
     toggleBtn.addEventListener('click', () => {
-      list.style.display = list.style.display === 'none' ? 'block' : 'none';
-      toggleBtn.textContent = list.style.display === 'none' ? '▼' : '▲';
+      communeList.style.display = communeList.style.display === 'none' ? 'block' : 'none';
+      toggleBtn.textContent = communeList.style.display === 'none' ? '▼' : '▲';
     });
 
     container.appendChild(item);
   });
 }
 
+async function newvisite(commune_codeinsee, etat_visite, date_visite) {
+  if (!currentUser) {
+    console.error("Aucun utilisateur connecté")
+    return;
+  }
+  const { data, error } = await supabase
+    .from('visite')
+    .upsert([{
+      user_id: currentUser.id,
+      commune_codeinsee: commune_codeinsee,
+      etat_visite: etat_visite,
+      date_visite: date_visite
+    }], { onConflict: ['user_id', 'commune_codeinsee'] });
+  if (error) {
+    console.error("Erreur lors de l'ajout de la visite :", error.message);
+    return;
+  }
+  console.log("ajout visite",commune_codeinsee )
+  return data;
+}
+
+async function deletevisite(commune_codeinsee) {
+  if (!currentUser) {
+    console.error("Aucun utilisateur connecté");
+    return;
+  }
+  const { data, error } = await supabase
+    .from('visite')
+    .delete()
+    .eq('user_id', currentUser.id)
+    .eq('commune_codeinsee', commune_codeinsee);
+  if (error) {
+    console.error("Erreur lors de la suppression de la visite :", error.message);
+    return;
+  }
+  console.log("suppression visite",commune_codeinsee )
+  return data;
+}
 
 async function chercherVisitesParNom(nomRecherche) {
 const { data, error } = await supabase
@@ -259,22 +313,6 @@ const { data, error } = await supabase
 
 return data;
 }
-
-async function chercherCommunesParNom(nomRecherche) {
-const { data, error } = await supabase
-  .from('commune')
-  .select('nom,code_insee,departement(code,nom)')
-  .ilike('nom', `%${nomRecherche}%`);
-
-  if (error) {
-    console.error("Erreur lors de la recherche :", error.message);
-    return [];
-  }
-
-return data;
-}
-
-
 
 async function afficherInfoCommune(codeInsee) {
   
@@ -293,7 +331,6 @@ async function afficherInfoCommune(codeInsee) {
     return;
   }
 
-  console.log(commune)
   const checkbox = document.getElementById('info-commune_visited');
   const selectStatus = document.getElementById('visit-status');
   const dateInput = document.getElementById('input-date');  
@@ -343,13 +380,7 @@ async function afficherInfoCommune(codeInsee) {
         ], { onConflict: ['user_id', 'commune_codeinsee'] });
         console.log("Ajout visite : ",commune.code_insee)
     } else {
-      console.log("suppression visite",commune.code_insee )
-      // Décocher → suppression
-      await supabase
-        .from('visite')
-        .delete()
-        .eq('user_id', currentUser.id)
-        .eq('commune_codeinsee', commune.code_insee);
+      deletevisite(commune.code_insee);
     }
     afficherInfoCommune(codeInsee)
   };
